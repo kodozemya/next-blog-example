@@ -1,0 +1,53 @@
+---
+title: "params — це проміс, і я витратив на це вечір"
+date: "2026-07-02"
+excerpt: "Кожна стаття давала 404, а причина була в одному пропущеному await."
+cover: "/covers/params-promise.jpg"
+tags: ["Next.js", "Помилки"]
+---
+
+Динамічний маршрут працював. Список статей працював. Але кожне посилання
+на статтю давало 404 — і жодної помилки в консолі.
+
+## Що я написав
+
+```tsx
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  const post = await getPostBySlug(params.slug); // ← ось воно
+  if (!post) notFound();
+  // ...
+}
+```
+
+Виглядає цілком нормально. І саме тому шукав я довго.
+
+## Що насправді відбувається
+
+У сучасному Next.js `params` — це **проміс**, а не звичайний об'єкт.
+Тому `params.slug` дорівнює `undefined`: у промісу немає властивості `slug`.
+Далі `getPostBySlug(undefined)` не знаходить файла `undefined.mdx`,
+повертає `null`, і сторінка чесно викликає `notFound()`.
+
+Помилки немає, бо помилки й немає. Код робить рівно те, що написано.
+
+## Як правильно
+
+```tsx
+type PageProps = { params: Promise<{ slug: string }> };
+
+export default async function PostPage({ params }: PageProps) {
+  const { slug } = await params; // ← проміс треба дочекатися
+  const post = await getPostBySlug(slug);
+  if (!post) notFound();
+  // ...
+}
+```
+
+## Мораль
+
+Типізуй `params` явно як `Promise<…>`. Якби я одразу написав правильний
+тип, TypeScript підкреслив би `params.slug` червоним у першу ж секунду —
+замість того, щоб дати мені шукати проблему у файловій системі,
+у `generateStaticParams` і в конфізі.
+
+> Тип — це не бюрократія. Це та людина, яка помічає одруківку раніше за тебе.

@@ -1,0 +1,699 @@
+/*
+  Стилі за макетом «The Blog».
+
+  Усі числа тут не вигадані: вони зняті з Figma через Dev Mode. Якщо бачиш
+  дивне значення на кшталт 243.8px або 20.05cqw — воно з макета, і поруч
+  стоїть коментар, звідки саме.
+
+  Розмітка макета влаштована так:
+    Section (1440) → Container (1280, padding 32) → контент (1216)
+  Тому .container нижче має max-width 1280 і padding 32 — щоб контент
+  усередині був рівно 1216, як у Figma.
+*/
+
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a; /* заголовки, назва в шапці, підвал */
+  --color-muted: #667085; /* описи статей */
+  --color-accent: #6941c6; /* дата над заголовком, посилання */
+  --color-line: rgb(0 0 0 / 34%); /* лінії навколо титулу, рамка поля пошуку */
+
+  /*
+    Сім пар «фон / текст» для бейджів — рівно ті, що є в макеті.
+    Який тон дістанеться тегу, вирішує не CSS, а badgeTone() у PostCard
+    (див. коментар до .badge--1 нижче).
+  */
+  --badge-1-bg: #f9f5ff;
+  --badge-1-text: #6941c6;
+  --badge-2-bg: #eef4ff;
+  --badge-2-text: #3538cd;
+  --badge-3-bg: #fdf2fa;
+  --badge-3-text: #c11574;
+  --badge-4-bg: #f0f9ff;
+  --badge-4-text: #026aa2;
+  --badge-5-bg: #ecfdf3;
+  --badge-5-text: #027a48;
+  --badge-6-bg: #f8f9fc;
+  --badge-6-text: #363f72;
+  --badge-7-bg: #fff6ed;
+  --badge-7-text: #c4320a;
+
+  /* Container 1280 з padding 32 дає контент 1216 — ширину сітки в макеті. */
+  --container: 1280px;
+  --gutter: 32px;
+
+  --font: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font);
+  font-size: 16px; /* Text md/Normal */
+  line-height: 24px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Шапка ---------- */
+
+/*
+  У макеті шапка має padding 30px згори й знизу, а сама смуга навігації —
+  ще по 10px. Разом 40px від краю сторінки до тексту «Your Name».
+*/
+.site-header {
+  padding-top: 30px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 10px 0;
+}
+
+.navbar__name {
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar__link {
+  font-size: 14px; /* Text sm/Semibold */
+  line-height: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-muted);
+}
+
+.navbar__link:hover {
+  color: var(--color-text);
+}
+
+/* ---------- Титул ---------- */
+
+/*
+  У макеті напис має кегль 243.8px при ширині контейнера 1216 — тобто
+  рівно 20.05% ширини. Одиниця cqw саме це й означає: відсоток ширини
+  контейнера. Тому напис лишається на всю ширину і на телефоні, і на
+  моніторі, без жодного @media і без ризику вилізти за край.
+
+  container-type робить .hero тим самим контейнером, від якого рахується cqw.
+*/
+.hero {
+  /* auto по боках — інакше margin перебив би центрування з .container */
+  margin: 50px auto 30px;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  container-type: inline-size;
+}
+
+.hero__title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 20.05cqw;
+  /*
+    1.21 — це те, що Figma називає line-height: normal для Inter.
+    243.8 × 1.21 ≈ 295 — саме така висота блока в макеті.
+  */
+  line-height: 1.21;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+/* ---------- Секції ---------- */
+
+/* У макеті кожна секція має padding 30px згори й знизу. */
+.section {
+  padding: 30px 0;
+}
+
+.section__title {
+  margin: 0 0 32px; /* Heading → Content = 64 − 32 = 32 */
+  font-size: 24px; /* Display xs/Semibold */
+  line-height: 32px;
+  font-weight: 600;
+}
+
+/* ---------- Сітка «Усі статті» ---------- */
+
+/*
+  У макеті три колонки по 384 з проміжком 32 (3×384 + 2×32 = 1216)
+  і 48 між рядами.
+*/
+.posts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px var(--gutter);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Блок «Останні статті» ---------- */
+
+/*
+  Розкладка з макета: велика картка ліворуч, дві компактні праворуч,
+  четверта — окремою секцією на всю ширину.
+*/
+.featured {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gutter);
+}
+
+.featured__lead,
+.featured__side,
+.featured__wide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.featured__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+/* ---------- Картка статті ---------- */
+
+/*
+  Картка одна на весь сайт, а розкладок у макета чотири. Різницю тримає
+  модифікатор на <li>, а не окремі компоненти: розмітка всередині
+  скрізь однакова.
+*/
+.post-card__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter); /* Image → Content = 32 у макеті */
+  text-decoration: none;
+}
+
+.post-card__cover {
+  width: 100%;
+  object-fit: cover;
+  /*
+    Кути в макеті прямі. Це не забуте заокруглення — заокруглення тут
+    немає жодного, навіть у бейджів обкладинок.
+  */
+  border-radius: 0;
+}
+
+/* Картка сітки «Усі статті»: обкладинка 384×240. */
+.post-card--column .post-card__cover {
+  height: 240px;
+}
+
+/* Велика картка блока «Останні»: обкладинка 592×228. */
+.post-card--lead .post-card__cover {
+  height: 228px;
+}
+
+/*
+  Поки колонки стоять поруч, обкладинка великої картки не має власної
+  висоти: вона забирає все, що лишилося від висоти сусідньої колонки.
+  Тому нижні краї обох колонок збігаються, хоч тексти різної довжини —
+  саме так це зроблено в макеті.
+
+  Ланцюжок flex тягнеться від сітки аж до самої картинки: кожна ланка
+  віддає висоту наступній. Нижче 1025px колонки стають одна під одною,
+  тягнутися нема за чим — і там лишається звичайні 228px.
+*/
+@media (min-width: 1025px) {
+  .featured__lead,
+  .featured__lead .post-card {
+    display: flex;
+  }
+
+  .featured__lead .post-card,
+  .post-card--lead .post-card__link,
+  .post-card--lead .post-card__cover {
+    flex: 1;
+  }
+
+  .post-card--lead .post-card__cover {
+    height: auto;
+    min-height: 228px;
+  }
+}
+
+/*
+  Компактна картка: обкладинка 320×200 ліворуч, текст праворуч,
+  проміжок 24. Заголовок дрібніший, стрілки немає — так у макеті.
+*/
+.post-card--compact .post-card__link {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.post-card--compact .post-card__cover {
+  height: 200px;
+}
+
+.post-card--compact .post-card__title {
+  font-size: 18px; /* Text lg/Semibold */
+  line-height: 28px;
+}
+
+/* У компактній картці заголовок і опис стоять на 8, а не на 12. */
+.post-card--compact .post-card__heading {
+  gap: 8px;
+}
+
+/* Картка на всю ширину: обкладинка й текст по половині, проміжок 32. */
+.post-card--wide .post-card__link {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gutter);
+  align-items: start;
+}
+
+.post-card--wide .post-card__cover {
+  height: 246px;
+}
+
+.post-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Heading and text → Categories */
+}
+
+.post-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Author → Heading */
+}
+
+.post-card__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Heading → Supporting text */
+}
+
+.post-card__meta {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 14px; /* Text sm/Semibold */
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.post-card__title {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 0;
+  font-size: 24px; /* Display xs/Semibold */
+  line-height: 32px;
+  font-weight: 600;
+}
+
+.post-card__title-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-card__link:hover .post-card__title {
+  color: var(--color-accent);
+}
+
+/* Стрілка стоїть на 4px нижче за верх рядка — так вона на око по центру. */
+.post-card__arrow {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.post-card__excerpt {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* ---------- Бейджі ---------- */
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.badge {
+  padding: 2px 10px;
+  border-radius: 16px;
+  font-size: 14px; /* Text sm/Medium */
+  line-height: 20px;
+  font-weight: 500;
+}
+
+/*
+  Сім кольорів з макета. Номер тону обирає не CSS, а PostCard: він рахує
+  його з тексту тегу, тож «CSS» усюди на сайті одного кольору, а сусідні
+  теги на картці — різних. Чергування через nth-child цього не дало б:
+  у кожної картки лічильник починається спочатку, і далі за третій
+  колір список не зайшов би.
+*/
+.badge--1 {
+  background: var(--badge-1-bg);
+  color: var(--badge-1-text);
+}
+
+.badge--2 {
+  background: var(--badge-2-bg);
+  color: var(--badge-2-text);
+}
+
+.badge--3 {
+  background: var(--badge-3-bg);
+  color: var(--badge-3-text);
+}
+
+.badge--4 {
+  background: var(--badge-4-bg);
+  color: var(--badge-4-text);
+}
+
+.badge--5 {
+  background: var(--badge-5-bg);
+  color: var(--badge-5-text);
+}
+
+.badge--6 {
+  background: var(--badge-6-bg);
+  color: var(--badge-6-text);
+}
+
+.badge--7 {
+  background: var(--badge-7-bg);
+  color: var(--badge-7-text);
+}
+
+/* ---------- Пошук ---------- */
+
+.search {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search__input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.search__status {
+  margin: 0 0 32px;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* ---------- Кнопка ---------- */
+
+/* Кнопка на сайті одна — «Спробувати ще раз» на сторінці помилки. */
+.button {
+  padding: 10px 18px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #5a35a8;
+}
+
+/* ---------- Сторінка 404 ---------- */
+
+.not-found {
+  padding-top: 64px;
+  padding-bottom: 64px;
+  text-align: center;
+}
+
+.not-found__text {
+  margin: 0 0 32px;
+  color: var(--color-muted);
+}
+
+/* ---------- Сторінка статті ---------- */
+
+.article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+
+/* Текстове посилання кольору акценту — «← Усі статті», «Усі статті →». */
+.link-accent {
+  display: inline-block;
+  color: var(--color-accent);
+  font-size: 14px; /* Text sm/Semibold */
+  line-height: 20px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.article__back {
+  margin-bottom: 32px;
+}
+
+.article__meta {
+  margin: 0 0 12px;
+  color: var(--color-accent);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.article__title {
+  margin: 0 0 24px;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.article__cover {
+  width: 100%;
+  height: auto;
+  margin-bottom: 40px;
+}
+
+/* Текст статті: MDX перетворюється на звичайні теги, тож стилюємо їх. */
+.article__body h2 {
+  margin: 40px 0 16px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.article__body h3 {
+  margin: 32px 0 12px;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.article__body p,
+.article__body li {
+  color: var(--color-muted);
+}
+
+.article__body pre {
+  padding: 16px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 6%);
+}
+
+.article__body code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 14px;
+}
+
+/*
+  Таблиці приходять із remarkGfm. Обгортки навколо них немає, тому
+  display: block і overflow-x беруть на себе саму таблицю: на телефоні
+  вона прокручується всередині себе, а не розсовує сторінку.
+*/
+.article__body table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.article__body th,
+.article__body td {
+  padding: 8px 12px;
+  border: 1px solid var(--color-line);
+  text-align: left;
+}
+
+.article__body th {
+  background: rgb(0 0 0 / 4%);
+  font-weight: 600;
+}
+
+.article__body td {
+  color: var(--color-muted);
+}
+
+.article__body blockquote {
+  margin: 24px 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* ---------- Підвал ---------- */
+
+/*
+  У макеті підвал — просто рядок посилань з проміжком 14 і кеглем 20.
+  Жодної лінії згори там немає.
+*/
+.footer {
+  padding: 30px 0;
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.footer__inner p {
+  margin: 0;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* У макеті посилання підвалу не підкреслені — підкреслення лише під мишею. */
+.footer__links a {
+  text-decoration: none;
+}
+
+.footer__links a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Планшет (макет iPad Pro 12, 834) ---------- */
+
+@media (max-width: 1024px) {
+  /* Блок «Останні» стає одноколонковим: велика картка, потім компактні. */
+  .featured {
+    grid-template-columns: 1fr;
+  }
+
+  /* Картка на всю ширину розгортається в стовпчик: обкладинка згори. */
+  .post-card--wide .post-card__link {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .post-card--wide .post-card__cover {
+    height: 188px;
+  }
+
+  /* У сітці «Усі статті» дві колонки з проміжком 16 і 24 між рядами. */
+  .posts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 16px;
+  }
+
+  /* На планшеті обкладинка й текст стоять на 24, а не на 32. */
+  .post-card--column .post-card__link,
+  .post-card--lead .post-card__link {
+    gap: 24px;
+  }
+}
+
+/* ---------- Телефон (макет iPhone 16, 390) ---------- */
+
+@media (max-width: 640px) {
+  .posts {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  /* Компактна картка теж стає стовпчиком — місця на рядок уже немає. */
+  .post-card--compact .post-card__link {
+    grid-template-columns: 1fr;
+  }
+
+  .post-card--wide .post-card__cover {
+    height: 200px;
+  }
+
+  .footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
