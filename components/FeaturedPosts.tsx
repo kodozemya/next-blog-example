@@ -38,11 +38,11 @@ export default function FeaturedPosts({ posts }: { posts: PostSummary[] }) {
           <div className="featured">
             <ul className="featured__lead">
               {/*
-                priority лише тут: це єдина обкладинка, яку видно одразу
+                preload лише тут: це єдина обкладинка, яку видно одразу
                 після завантаження сторінки. Позначити пріоритетними всі —
                 те саме, що не позначити жодну.
               */}
-              <PostCard post={lead} layout="lead" headingLevel={3} priority />
+              <PostCard post={lead} layout="lead" headingLevel={3} preload />
             </ul>
 
             {compact.length > 0 && (

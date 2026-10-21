@@ -26,7 +26,7 @@ type PostCardProps = {
    * усі картки — те саме, що не позначити жодної: браузер вантажитиме
    * двадцять картинок водночас і жодну не покаже швидко.
    */
-  priority?: boolean;
+  preload?: boolean;
   layout?: PostCardLayout;
   /**
    * Рівень заголовка картки.
@@ -54,7 +54,7 @@ const COVER_SIZES: Record<PostCardLayout, string> = {
 
 export default function PostCard({
   post,
-  priority = false,
+  preload = false,
   layout = "column",
   headingLevel = 2,
 }: PostCardProps) {
@@ -86,12 +86,11 @@ export default function PostCard({
           height={360}
           sizes={COVER_SIZES[layout]}
           /*
-            priority сам робить усе потрібне: ставить loading="eager",
-            fetchpriority="high" і додає <link rel="preload"> у <head>.
-            Дописувати ці атрибути руками поруч — зайве, а Next.js ще
-            й попереджає про це в консолі.
+            preload (у Next.js 16 він замінив застарілий priority) вимикає
+            ліниве завантаження і додає <link rel="preload"> у <head>.
+            Разом із loading="lazy" його ставити не можна: Next.js кине помилку.
           */
-          priority={priority}
+          preload={preload}
         />
 
         <div className="post-card__content">

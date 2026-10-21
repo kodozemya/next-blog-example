@@ -26,7 +26,7 @@ export const site = {
    * яким поділилися, тягне картинку з чужого комп'ютера.
    * Після першого деплою підстав сюди свою адресу на Vercel.
    */
-  url: "https://example-nextjs-blog.vercel.app",
+  url: "https://next-blog-example-kohl.vercel.app",
 
   description:
     "Особистий блог про фронтенд: React, TypeScript, Next.js і те, що трапляється дорогою.",

@@ -16,7 +16,7 @@ import { getAllPosts, getPostBySlug } from "@/lib/posts";
   У сучасному Next.js params — це ПРОМІС, а не звичайний об'єкт.
   Тому тип нижче саме Promise<{ slug: string }>, а нижче стоїть await.
   Спроба прочитати params.slug напряму дасть undefined і сторінку 404
-  для кожної статті — це найчастіша помилка на цьому бої.
+  для кожної статті. Це найчастіша помилка в цьому завданні.
 */
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -118,7 +118,7 @@ export default async function PostPage({ params }: PageProps) {
 
           {/*
             Обкладинка статті — єдине зображення на першому екрані,
-            тому priority. На решті сторінки таких немає.
+            тому preload. На решті сторінки таких немає.
           */}
           <Image
             className="article__cover"
@@ -127,7 +127,7 @@ export default async function PostPage({ params }: PageProps) {
             width={1200}
             height={630}
             sizes="(max-width: 768px) 100vw, 720px"
-            priority
+            preload
           />
 
           <div className="article__body">{content}</div>

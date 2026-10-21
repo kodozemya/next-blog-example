@@ -44,22 +44,29 @@ export type Post = PostSummary & {
  * і мовчазну порожнечу замість помилки.
  */
 function parseFrontmatter(data: Record<string, unknown>, slug: string): PostFrontmatter {
-  const required = ["title", "date", "excerpt", "cover"] as const;
-
-  for (const field of required) {
-    if (typeof data[field] !== "string") {
+  /*
+    typeof звужує unknown до string, тому тут не потрібен жоден `as`:
+    після перевірки TypeScript сам знає, що value — рядок.
+  */
+  function requireString(field: "title" | "date" | "excerpt" | "cover"): string {
+    const value = data[field];
+    if (typeof value !== "string") {
       throw new Error(
         `У статті «${slug}» у фронтматері бракує поля «${field}» або воно не рядок.`,
       );
     }
+    return value;
   }
 
   return {
-    title: data.title as string,
-    date: data.date as string,
-    excerpt: data.excerpt as string,
-    cover: data.cover as string,
-    tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+    title: requireString("title"),
+    date: requireString("date"),
+    excerpt: requireString("excerpt"),
+    cover: requireString("cover"),
+    // Лишаємо тільки рядки: `tags: [1, true]` у фронтматері не стане string[].
+    tags: Array.isArray(data.tags)
+      ? data.tags.filter((tag): tag is string => typeof tag === "string")
+      : [],
   };
 }
 
